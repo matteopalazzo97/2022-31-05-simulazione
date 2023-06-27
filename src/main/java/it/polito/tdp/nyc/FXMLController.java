@@ -7,6 +7,7 @@ package it.polito.tdp.nyc;
 import java.net.URL;
 import java.util.ResourceBundle;
 import it.polito.tdp.nyc.model.Model;
+import it.polito.tdp.nyc.model.VerticeDist;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -39,7 +40,7 @@ public class FXMLController {
     private ComboBox<String> cmbProvider; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbQuartiere"
-    private ComboBox<?> cmbQuartiere; // Value injected by FXMLLoader
+    private ComboBox<String> cmbQuartiere; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtMemoria"
     private TextField txtMemoria; // Value injected by FXMLLoader
@@ -59,10 +60,33 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	
+    	if(this.cmbProvider.getValue() == null) {
+    		this.txtResult.setText("Seleziona un valore dalla tendina.");
+    	} else {
+    		
+    		this.model.creaGrafo(this.cmbProvider.getValue());
+    		
+    		this.txtResult.setText("Grafo creato.\n");
+    		this.txtResult.appendText("# vertici: " + this.model.getNumVertici() + "\n");
+    		this.txtResult.appendText("# archi:   " + this.model.getNumArchi() + "\n");
+    		
+    		this.cmbQuartiere.getItems().addAll(this.model.getVertici(this.cmbProvider.getValue()));
+    		
+    	}
+    	
     }
 
     @FXML
     void doQuartieriAdiacenti(ActionEvent event) {
+    	
+    	if(this.cmbQuartiere.getValue() == null) {
+    		this.txtResult.setText("Scegli un valore dalla tendina.");
+    		return;
+    	} else {
+    		for(VerticeDist v: this.model.getVicini(this.cmbProvider.getValue(), this.cmbQuartiere.getValue())) {
+    			this.txtResult.appendText(v.toString() + "\n");
+    		}
+    	}
     	
     }
 
@@ -87,6 +111,8 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	this.cmbProvider.getItems().addAll(this.model.getTendina());
     }
 
 }
